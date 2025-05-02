@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('scoreDisplay');
+    const livesDisplay = document.getElementById('livesDisplay');
     const startButton = document.getElementById('startButton');
     const gameOverDisplay = document.getElementById('gameOver');
 
@@ -9,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameRunning = false;
     let score = 0;
     let lives = 3;
+    let gameLoopId = null;
     
     // Player
     const player = {
@@ -19,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
         speed: 8,
         color: '#0f0',
         isMovingLeft: false,
-        isMovingRight: false
+        isMovingRight: false,
+        shotCooldown: 0
     };
 
     // Bullets
@@ -66,7 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         lives = 3;
         invaderSpeed = 1;
         invaderDirection = 1;
+        player.shotCooldown = 0;
         updateScore();
+        updateLives();
 
         // Create invaders
         for (let r = 0; r < invaderRows; r++) {
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < 4; i++) {
             bunkers.push({
                 x: i * (bunkerWidth + bunkerPadding) + (canvas.width - (4 * bunkerWidth + 3 * bunkerPadding)) / 2,
-                y: canvas.height - 120,
+                y: canvas.height - 150,
                 width: bunkerWidth,
                 height: bunkerHeight,
                 color: '#0a0'
@@ -96,11 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset player position
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
+        player.isMovingLeft = false;
+        player.isMovingRight = false;
     }
 
     // Update score display
     function updateScore() {
         scoreDisplay.textContent = `SCORE: ${score}`;
+    }
+
+    // Update lives display
+    function updateLives() {
+        livesDisplay.textContent = `LIVES: ${lives}`;
     }
 
     // Draw player
@@ -150,21 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Draw lives
-    function drawLives() {
-        ctx.fillStyle = '#0f0';
-        for (let i = 0; i < lives; i++) {
-            ctx.fillRect(10 + i * 30, canvas.height - 20, 20, 10);
-        }
-    }
-
     // Update player position
-    function updatePlayer() {
+    function updatePlayer(deltaTime) {
         if (player.isMovingLeft && player.x > 0) {
             player.x -= player.speed;
         }
         if (player.isMovingRight && player.x < canvas.width - player.width) {
             player.x += player.speed;
+        }
+        
+        // Update shot cooldown
+        if (player.shotCooldown > 0) {
+            player.shotCooldown -= deltaTime;
         }
     }
 
@@ -277,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkCollision(invaderBullets[i], player)) {
                 invaderBullets.splice(i, 1);
                 lives--;
+                updateLives();
                 if (lives <= 0) {
                     gameOver();
                 }
@@ -314,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Game over
     function gameOver() {
         gameRunning = false;
+        cancelAnimationFrame(gameLoopId);
         gameOverDisplay.style.display = 'block';
     }
 
@@ -324,8 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        // Calculate delta time
+        const deltaTime = 16; // Approximate for 60fps
+        
         // Update game state
-        updatePlayer();
+        updatePlayer(deltaTime);
         updateBullets();
         updateInvaders();
         updateInvaderBullets(timestamp);
@@ -336,27 +350,28 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBullets();
         drawInvaderBullets();
         drawPlayer();
-        drawLives();
         
         // Check win condition
         if (invaders.length === 0) {
-            // Level complete (in a real game you'd load the next level)
             gameOverDisplay.textContent = "YOU WIN!";
             gameOver();
             return;
         }
         
         // Continue game loop
-        requestAnimationFrame(gameLoop);
+        gameLoopId = requestAnimationFrame(gameLoop);
     }
 
     // Event listeners
     startButton.addEventListener('click', () => {
+        if (gameLoopId) {
+            cancelAnimationFrame(gameLoopId);
+        }
         initGame();
         gameRunning = true;
         gameOverDisplay.style.display = 'none';
         gameOverDisplay.textContent = "GAME OVER";
-        requestAnimationFrame(gameLoop);
+        gameLoopId = requestAnimationFrame(gameLoop);
     });
 
     document.addEventListener('keydown', (e) => {
@@ -370,13 +385,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 player.isMovingRight = true;
                 break;
             case ' ':
-                // Shoot bullet
-                bullets.push({
-                    x: player.x + player.width / 2 - bulletWidth / 2,
-                    y: player.y,
-                    width: bulletWidth,
-                    height: bulletHeight
-                });
+                // Shoot bullet (with cooldown)
+                if (player.shotCooldown <= 0) {
+                    bullets.push({
+                        x: player.x + player.width / 2 - bulletWidth / 2,
+                        y: player.y,
+                        width: bulletWidth,
+                        height: bulletHeight
+                    });
+                    player.shotCooldown = 300; // 300ms cooldown
+                }
                 break;
         }
     });
