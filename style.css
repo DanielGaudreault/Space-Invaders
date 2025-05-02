@@ -4,30 +4,47 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #000;
-    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, #1a1a2e 0%, #000000 100%);
+    font-family: 'Orbitron', sans-serif; /* Use a sci-fi font (loaded via Google Fonts or fallback) */
+    overflow: hidden;
 }
 
 #game-container {
     text-align: center;
+    position: relative;
 }
 
+/* Starry background for canvas */
 #gameCanvas {
-    border: 2px solid #fff;
-    background-color: #000;
+    border: 3px solid #00ffcc;
+    box-shadow: 0 0 20px #00ffcc;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="black"/><circle cx="50" cy="50" r="2" fill="white" opacity="0.8"/><circle cx="200" cy="100" r="1" fill="white" opacity="0.6"/><circle cx="300" cy="200" r="2" fill="white" opacity="0.7"/><circle cx="400" cy="150" r="1" fill="white" opacity="0.5"/><circle cx="500" cy="300" r="2" fill="white" opacity="0.8"/><circle cx="600" cy="250" r="1" fill="white" opacity="0.6"/><circle cx="700" cy="350" r="2" fill="white" opacity="0.7"/><circle cx="100" cy="400" r="1" fill="white" opacity="0.5"/><circle cx="250" cy="450" r="2" fill="white" opacity="0.8"/><circle cx="350" cy="500" r="1" fill="white" opacity="0.6"/></svg>');
 }
 
+/* Score display with neon effect */
 #score {
-    color: #fff;
-    font-size: 24px;
-    margin-top: 10px;
+    color: #00ffcc;
+    font-size: 28px;
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    margin-top: 15px;
+    letter-spacing: 2px;
 }
 
+/* Game over screen with animation */
 #gameOver {
-    color: #ff0000;
-    font-size: 32px;
+    color: #ff3333;
+    font-size: 40px;
+    text-shadow: 0 0 15px #ff3333, 0 0 30px #ff3333;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    animation: pulse 1.5s infinite;
+}
+
+/* Pulse animation for game over text */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }
