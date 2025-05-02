@@ -4,9 +4,10 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: radial-gradient(circle, #1a1a2e 0%, #000000 100%);
-    font-family: 'Orbitron', sans-serif; /* Use a sci-fi font (loaded via Google Fonts or fallback) */
+    background: radial-gradient(circle, #0a0a23 0%, #000000 100%);
+    font-family: 'Orbitron', sans-serif;
     overflow: hidden;
+    color: #fff;
 }
 
 #game-container {
@@ -14,27 +15,50 @@ body {
     position: relative;
 }
 
-/* Starry background for canvas */
 #gameCanvas {
-    border: 3px solid #00ffcc;
-    box-shadow: 0 0 20px #00ffcc;
+    border: 4px solid #00ffcc;
+    box-shadow: 0 0 30px #00ffcc;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="black"/><circle cx="50" cy="50" r="2" fill="white" opacity="0.8"/><circle cx="200" cy="100" r="1" fill="white" opacity="0.6"/><circle cx="300" cy="200" r="2" fill="white" opacity="0.7"/><circle cx="400" cy="150" r="1" fill="white" opacity="0.5"/><circle cx="500" cy="300" r="2" fill="white" opacity="0.8"/><circle cx="600" cy="250" r="1" fill="white" opacity="0.6"/><circle cx="700" cy="350" r="2" fill="white" opacity="0.7"/><circle cx="100" cy="400" r="1" fill="white" opacity="0.5"/><circle cx="250" cy="450" r="2" fill="white" opacity="0.8"/><circle cx="350" cy="500" r="1" fill="white" opacity="0.6"/></svg>');
 }
 
-/* Score display with neon effect */
-#score {
-    color: #00ffcc;
-    font-size: 28px;
-    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-    margin-top: 15px;
-    letter-spacing: 2px;
+#hud {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid #00ffcc;
 }
 
-/* Game over screen with animation */
+#score, #lives, #level, #highScore {
+    font-size: 20px;
+    text-shadow: 0 0 10px #00ffcc;
+}
+
+#startScreen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #00ffcc;
+    text-shadow: 0 0 15px #00ffcc;
+    z-index: 10;
+    animation: glow 2s infinite;
+}
+
+#startScreen h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+#startScreen p {
+    font-size: 24px;
+}
+
 #gameOver {
     color: #ff3333;
-    font-size: 40px;
-    text-shadow: 0 0 15px #ff3333, 0 0 30px #ff3333;
+    font-size: 48px;
+    text-shadow: 0 0 20px #ff3333;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -42,9 +66,21 @@ body {
     animation: pulse 1.5s infinite;
 }
 
-/* Pulse animation for game over text */
+@keyframes glow {
+    0% { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; }
+    50% { text-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc; }
+    100% { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; }
+}
+
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
+}
+
+.particle {
+    position: absolute;
+    background: #ffcc00;
+    border-radius: 50%;
+    pointer-events: none;
 }
