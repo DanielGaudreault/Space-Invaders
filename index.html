@@ -1,72 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invaders</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-        }
-        #gameCanvas {
-            border: 2px solid #0f0;
-        }
-        #gameContainer {
-            text-align: center;
-        }
-        #scoreDisplay {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        #startButton {
-            background-color: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 10px 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        #startButton:hover {
-            background-color: #0f0;
-            color: #000;
-        }
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            display: none;
-            color: #f00;
-            text-shadow: 0 0 10px #fff;
-        }
-        #livesDisplay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Space Invaders</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="gameContainer">
-        <div id="scoreDisplay">SCORE: 0</div>
-        <div id="livesDisplay">LIVES: 3</div>
-        <canvas id="gameCanvas" width="600" height="700"></canvas>
-        <button id="startButton">START GAME</button>
-        <div id="gameOver">GAME OVER</div>
-    </div>
-
-    <script src="game.js"></script>
+  <canvas id="gameCanvas" width="600" height="600"></canvas>
+  <script src="game.js"></script>
 </body>
 </html>
