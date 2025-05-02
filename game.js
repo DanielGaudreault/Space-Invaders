@@ -355,6 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initGame();
         gameRunning = true;
         gameOverDisplay.style.display = 'none';
+        gameOverDisplay.textContent = "GAME OVER";
         requestAnimationFrame(gameLoop);
     });
 
