@@ -14,9 +14,11 @@ let player = {
     dx: 0
 };
 
-let bullets = [];
+let bullets = []; // Player bullets
+let enemyBullets = []; // Enemy bullets
 let enemies = [];
 let score = 0;
+let level = 1;
 let gameOver = false;
 
 // Enemy settings
@@ -27,6 +29,7 @@ const enemyHeight = 30;
 const enemyPadding = 10;
 let enemySpeed = 1;
 let enemyDirection = 1;
+let enemyShootChance = 0.005; // Initial chance per frame for enemy to shoot
 
 // Keyboard controls
 let keys = {
@@ -61,7 +64,7 @@ function initEnemies() {
 
 // Draw player
 function drawPlayer() {
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'linear-gradient(#00ffcc, #00cc99)';
     ctx.fillRect(player.x, player.y, player.width, player.height);
     // Optional: Add image
     // const playerImg = new Image();
@@ -70,16 +73,22 @@ function drawPlayer() {
 }
 
 // Draw bullets
-function drawBullets() {
-    ctx.fillStyle = 'yellow';
+ながらfunction drawBullets() {
+    // Player bullets
+    ctx.fillStyle = '#ffcc00';
     bullets.forEach(bullet => {
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+    });
+    // Enemy bullets
+    ctx.fillStyle = '#ff3333';
+    enemyBullets.forEach(bullet => {
         ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
     });
 }
 
 // Draw enemies
 function drawEnemies() {
-    ctx.fillStyle = 'green';
+    ctx.fillStyle = 'linear-gradient(#33cc33, #339933)';
     enemies.forEach(enemy => {
         if (enemy.alive) {
             ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
@@ -101,13 +110,19 @@ function movePlayer() {
 
 // Move bullets
 function moveBullets() {
+    // Player bullets
     bullets.forEach((bullet, index) => {
         bullet.y -= bullet.speed;
         if (bullet.y < 0) bullets.splice(index, 1);
     });
+    // Enemy bullets
+    enemyBullets.forEach((bullet, index) => {
+        bullet.y += bullet.speed;
+        if (bullet.y > canvas.height) enemyBullets.splice(index, 1);
+    });
 }
 
-// Shoot bullet
+// Shoot bullet (player)
 function shoot() {
     if (keys.Space && !gameOver) {
         bullets.push({
@@ -119,6 +134,21 @@ function shoot() {
         });
         keys.Space = false; // Prevent rapid fire
     }
+}
+
+// Enemy shooting
+function enemyShoot() {
+    enemies.forEach(enemy => {
+        if (enemy.alive && Math.random() < enemyShootChance) {
+            enemyBullets.push({
+                x: enemy.x + enemy.width / 2 - 2.5,
+                y: enemy.y + enemy.height,
+                width: 5,
+                height: 10,
+                speed: 5
+            });
+        }
+    });
 }
 
 // Move enemies
@@ -140,7 +170,7 @@ function moveEnemies() {
         });
     }
 
-    // Check for game over
+    // Check for game over (enemies reach player level)
     enemies.forEach(enemy => {
         if (enemy.alive && enemy.y + enemy.height >= player.y) {
             gameOver = true;
@@ -151,6 +181,7 @@ function moveEnemies() {
 
 // Check collisions
 function checkCollisions() {
+    // Player bullets hitting enemies
     bullets.forEach((bullet, bulletIndex) => {
         enemies.forEach((enemy, enemyIndex) => {
             if (enemy.alive &&
@@ -165,17 +196,43 @@ function checkCollisions() {
             }
         });
     });
+
+    // Enemy bullets hitting player
+    enemyBullets.forEach((bullet, bulletIndex) => {
+        if (bullet.x < player.x + player.width &&
+            bullet.x + bullet.width > player.x &&
+            bullet.y < player.y + player.height &&
+            bullet.y + bullet.height > player.y) {
+            gameOver = true;
+            gameOverElement.style.display = 'block';
+            enemyBullets.splice(bulletIndex, 1);
+        }
+    });
+}
+
+// Check for level completion
+function checkLevel() {
+    if (enemies.every(enemy => !enemy.alive)) {
+        level++;
+        enemySpeed += 0.5; // Increase speed
+        enemyShootChance += 0.002; // Increase shooting frequency
+        initEnemies(); // Spawn new wave
+    }
 }
 
 // Reset game
 function resetGame() {
     player.x = canvas.width / 2 - 25;
     bullets = [];
-    score =  0;
+    enemyBullets = [];
+    score = 0;
+    level = 1;
     gameOver = false;
-    gameOverElement.style.display = 'none';
     enemySpeed = 1;
+    enemyShootChance = 0.005;
     enemyDirection = 1;
+    gameOverElement.style.display = 'none';
+    scoreElement.textContent = `Score: ${score}`;
     initEnemies();
 }
 
@@ -185,9 +242,11 @@ function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         movePlayer();
         shoot();
+        enemyShoot();
         moveBullets();
         moveEnemies();
         checkCollisions();
+        checkLevel();
         drawPlayer();
         drawBullets();
         drawEnemies();
