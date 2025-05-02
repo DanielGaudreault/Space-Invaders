@@ -47,13 +47,22 @@
             transform: translate(-50%, -50%);
             font-size: 48px;
             display: none;
+            color: #f00;
+            text-shadow: 0 0 10px #fff;
+        }
+        #livesDisplay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <div id="scoreDisplay">SCORE: 0</div>
-        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        <div id="livesDisplay">LIVES: 3</div>
+        <canvas id="gameCanvas" width="600" height="700"></canvas>
         <button id="startButton">START GAME</button>
         <div id="gameOver">GAME OVER</div>
     </div>
